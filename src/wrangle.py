@@ -137,7 +137,7 @@ def fill_nulls(df):
     df.pooltypeid10 = df.pooltypeid10.fillna(0)
     df.pooltypeid2 = df.pooltypeid2.fillna(0)
     df.pooltypeid7 = df.pooltypeid7.fillna(0)
-    df.unitcnt = df.unitcnt.fillna(0)
+    #df.unitcnt = df.unitcnt.fillna(0)
     #df.heatingorsystemdesc = df.heatingorsystemdesc.fillna('None') # check if it is ok
 
 
@@ -158,18 +158,19 @@ def fill_nulls(df):
             'propertycountylandusecode':'county_land_code',
             'regionidcity':'city_id',
             'regionidzip':'zip',
-            'unitcnt':'unit',
+            #'unitcnt':'unit',
             'yearbuilt':'year_built',
             'structuretaxvaluedollarcnt':'structure_price',
             'taxvaluedollarcnt':'price',
             'landtaxvaluedollarcnt':'land_price',
             'taxamount':'tax_amount',
             }, inplace=True)
+    #df = df[(df.unitcnt != 2) | (df.unit != 3)]
 
     # too many  or 1 categorical unique values or identical to other columns
     df.drop(columns=['calculatedbathnbr', 'basementsqft', 'finishedsquarefeet12',
                     'rawcensustractandblock', 
-                    'regionidcounty', 'regionidneighborhood', 'roomcnt',
+                    'regionidcounty', 'regionidneighborhood', 'roomcnt', 'unitcnt',
                     'censustractandblock', 'assessmentyear', 'transactiondate',
                     'propertylandusedesc', 'heatingorsystemdesc'], 
             inplace=True)
@@ -323,6 +324,13 @@ def get_zillow():
 
     return df
 
+########### bins for exploration ######
+
+def add_bins(df):
+    df['age_bins'] = pd.cut(df.age, bins=[0, 20, 40, 60, 80, 100, 130])
+    df.age_bins = df.age_bins.astype(str)
+    df['log_bins'] = pd.cut(df.logerror, bins=[-0.55, -0.25, 0, 0.25, 0.55])
+    return df
 
 ############### SPLIT FUCNTIONS ########
 def split_zillow(df):
@@ -339,7 +347,7 @@ def split_zillow(df):
                                        random_state=seed)
     return train, validate, test
 
-def full_split3_zillow(train, validate, test, target):
+def full_split_zillow(train, validate, test, target):
     '''
     accepts train, validate, test data sets and the name of the target variable as a parameter
     splits the data frame into:
@@ -359,6 +367,34 @@ def full_split3_zillow(train, validate, test, target):
 
     return train, validate, test, y_train, y_validate, y_test
 
+##### scaling #####
+def standard_scale_zillow(X_train, X_validate, X_test):
+    '''
+    accepts train, validate, test data sets
+    scales the data in each of them
+    returns transformed data sets
+    '''
+
+    #col = ['bedrooms', 'bathrooms', 'sq_feet', 'lot_sqft', 'house_age']
+    
+    # create scalers
+    scaler = StandardScaler()    
+    #qt = QuantileTransformer(output_distribution='normal')
+    scaler.fit(X_train)
+    X_train_scaled = scaler.transform(X_train)
+    X_validate_scaled = scaler.transform(X_validate)
+    X_test_scaled = scaler.transform(X_test)
+    
+    return X_train_scaled, X_validate_scaled, X_test_scaled
+
+def scale_dataframe(train):
+    '''
+    scale a data frame for clustering
+    '''
+    # create scalers
+    scaler = StandardScaler()    
+    #qt = QuantileTransformer(output_distribution='normal')
+    return scaler.fit_transform(train)
 
 
 ############ printing functions ###########
@@ -379,3 +415,4 @@ def print_value_counts(df):
         print(col)
         display(df[col].value_counts(dropna=False).reset_index())
         print()
+
