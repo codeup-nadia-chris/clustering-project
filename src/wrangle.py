@@ -284,13 +284,13 @@ def engineering(df):
     df['county_land_code'] = df['county_land_code'].astype(int)
     
     # add a new column with county names
-    df['county_name'] = np.select([(df.fips == 6037), (df.fips == 6059), (df.fips == 6111)],
-                             ['LA', 'Orange', 'Ventura'])
+    df['county_name'] = np.select([((df.fips == 6037) & (df['city_id'] == 12447)),((df.fips == 6037) & (df['city_id'] != 12447)), (df.fips == 6059), (df.fips == 6111)],
+                         ['LA_city', 'LA', 'Orange', 'Ventura'])
     # create column county_number to help with clustering
-    df['county_number']=df.county_name.map({'LA':0, 'Ventura':1, 'Orange':2})
-    df['la_city'] = df['city_id'].apply(lambda x: 1 if x == 12447 else 0)
+    df['county_number']=df.county_name.map({'LA':0, 'LA_city':1, 'Ventura':2, 'Orange':3})
+    #df['la_city'] = df['city_id'].apply(lambda x: 1 if x == 12447 else 0)
     df['county_number'] = df['county_number'].astype('uint8')
-    df['la_city'] = df['la_city'].astype('uint8')
+    #df['la_city'] = df['la_city'].astype('uint8')
     
     df.drop(columns=['year_built', 'fips'], inplace=True)
     # column to category data type
@@ -299,7 +299,7 @@ def engineering(df):
         'structure_price', 'price','land_price', 'tax_amount', 
         'bed_bath_ratio', 'city_id', 'zip', 'latitude', 'longitude',
         'bath', 'beds', 'fireplace', 'garage', 'hottub_spa', 'pool', 
-        'unit', 'county_land_code', 'county_number', 'la_city', 'county_name', 'logerror']
+        'unit', 'county_land_code', 'county_number', 'county_name', 'logerror']
     return df[new_order_cols]
 
 ######## get_zillow ready for exploration ######
