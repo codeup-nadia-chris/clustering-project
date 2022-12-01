@@ -278,6 +278,9 @@ def engineering(df):
     '''
     df['age'] = 2017 - df.year_built
     df['bed_bath_ratio'] = round(df.beds / df.bath, 2)
+
+    df['county_land_code'] = df.county_land_code.replace({'010G':'0106', '010M':'0107'})
+    df['county_land_code'] = df['county_land_code'].astype(int)
     
     # add a new column with county names
     df['county_name'] = np.select([(df.fips == 6037), (df.fips == 6059), (df.fips == 6111)],
