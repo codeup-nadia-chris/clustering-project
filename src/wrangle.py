@@ -216,7 +216,8 @@ def handle_outliers(df):
     returns a data frame without some outliers
     in total removes 1208 rows
     '''
-
+    # zip code out of max range
+    df = df[df.zip <= 99950]
     # remove bedrooms and bathrooms > 0 and < 7
     df = df[df.bath != 0]
     df = df[df.beds != 0]
