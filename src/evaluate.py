@@ -17,6 +17,24 @@ import pandas as pd
 import numpy as np
 from math import sqrt
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.linear_model import LinearRegression
+from scipy.stats import spearmanr, pearsonr
+
+#############################################################
+######   Tests for Continuous Variable Correlation   ########
+#############################################################
+
+#######       Spearman       *******
+def spearman_test(df, target_var, test_var):
+    r, p_value = spearmanr(df[target_var], df[test_var])
+    print(f'Spearman Correlation Coefficient of {test_var}: {r}\nP-value: {p_value:.3f}')
+
+#######       Pearson       *******
+def pearson_test(df, target_var, test_var):
+    r, p_value = pearsonr(df[target_var], df[test_var])
+    print(f'Pearson Correlation Coefficient of {test_var}: {r}\nP-value: {p_value:.3f}')
+
+
 
 
 
@@ -158,7 +176,7 @@ def better_than_baseline(y, yhat):
 
 ''' 
 making models for each county
-'''
+
 
 # la county
 # fit data to simple regression
@@ -181,4 +199,4 @@ lm.fit(vent_x_train, vent_y_train)
 # make predictions
 vent_simple_model = lm.predict(vent_x_train)
 
-
+'''
