@@ -19,22 +19,39 @@ from math import sqrt
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.linear_model import LinearRegression
 from scipy.stats import spearmanr, pearsonr
+import pingouin as pg
 
 #############################################################
 ######   Tests for Continuous Variable Correlation   ########
 #############################################################
 
-#######       Spearman       *******
+##############              Spearman             ##############
 def spearman_test(df, target_var, test_var):
+    '''alternative test for continuous to continuous correlation tests.
+    Is used when correlation has a curilinear shape, rather than linear.
+    Must have a roughly monotonic relationship.'''
     r, p_value = spearmanr(df[target_var], df[test_var])
     print(f'Spearman Correlation Coefficient of {test_var}: {r}\nP-value: {p_value:.3f}')
 
-#######       Pearson       *******
+##############              Pearson              ##############
+
 def pearson_test(df, target_var, test_var):
+    '''default test for continuous to continuous correlation tests. 
+    Handles linear relationships well'''
     r, p_value = pearsonr(df[target_var], df[test_var])
     print(f'Pearson Correlation Coefficient of {test_var}: {r}\nP-value: {p_value:.3f}')
 
 
+##############################################################
+######   Tests for Categorical Variable Correlation   ########
+##############################################################
+
+##############              T-Test              ##############
+def t_test(df, target_var, test_var):
+    '''test for determining if there is a statistically significant 
+    relationship between a categorical and continuous variable'''
+    results = pg.ttest(df[target_var], df[test_var], correction=True)
+    print(f'P-Val {test_var} = {results.iloc[0,3]:.3f}')
 
 
 
