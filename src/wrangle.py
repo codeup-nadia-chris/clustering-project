@@ -289,6 +289,8 @@ def engineering(df):
     # create column county_number to help with clustering
     df['county_number']=df.county_name.map({'LA':0, 'Ventura':1, 'Orange':2})
     df['la_city'] = df['city_id'].apply(lambda x: 1 if x == 12447 else 0)
+    df['county_number'] = df['county_number'].astype('uint8')
+    df['la_city'] = df['la_city'].astype('uint8')
     
     df.drop(columns=['year_built', 'fips'], inplace=True)
     # column to category data type
@@ -297,7 +299,7 @@ def engineering(df):
         'structure_price', 'price','land_price', 'tax_amount', 
         'bed_bath_ratio', 'city_id', 'zip', 'latitude', 'longitude',
         'bath', 'beds', 'fireplace', 'garage', 'hottub_spa', 'pool', 
-        'unit', 'county_land_code', 'county_name', 'county_number', 'la_city', 'logerror']
+        'unit', 'county_land_code', 'county_number', 'la_city', 'county_name', 'logerror']
     return df[new_order_cols]
 
 ######## get_zillow ready for exploration ######
