@@ -278,6 +278,7 @@ def engineering(df):
     '''
     df['age'] = 2017 - df.year_built
     df['bed_bath_ratio'] = round(df.beds / df.bath, 2)
+    #df['acres'] = df.lot_sqft/43560
 
     df['county_land_code'] = df.county_land_code.replace({'010G':'0106', '010M':'0107'})
     df['county_land_code'] = df['county_land_code'].astype(int)
@@ -285,6 +286,10 @@ def engineering(df):
     # add a new column with county names
     df['county_name'] = np.select([(df.fips == 6037), (df.fips == 6059), (df.fips == 6111)],
                              ['LA', 'Orange', 'Ventura'])
+    # create column county_number to help with clustering
+    df['county_number']=df.county_name.map({'LA':0, 'Ventura':1, 'Orange':2})
+    df['la_city'] = df['city_id'].apply(lambda x: 1 if x == 12447 else 0)
+    
     df.drop(columns=['year_built', 'fips'], inplace=True)
     # column to category data type
    
@@ -292,7 +297,7 @@ def engineering(df):
         'structure_price', 'price','land_price', 'tax_amount', 
         'bed_bath_ratio', 'city_id', 'zip', 'latitude', 'longitude',
         'bath', 'beds', 'fireplace', 'garage', 'hottub_spa', 'pool', 
-        'unit', 'county_land_code', 'county_name', 'logerror']
+        'unit', 'county_land_code', 'county_name', 'county_number', 'la_city', 'logerror']
     return df[new_order_cols]
 
 ######## get_zillow ready for exploration ######
