@@ -20,6 +20,9 @@ import src.env as env
 # random state seed
 seed = 42
 
+# target variable for modeling
+target = 'logerror'
+
 # sql query to get the data
 #Create the SQL query
 query = '''
@@ -419,28 +422,7 @@ def engineering(df):
     return df[new_order_cols]
 
 
-'''
-######## get_zillow ready for exploration ######
 
-def get_zillow():
-    
-    acquires the data from zillow database
-    cleans and prepares the data for the exploration
-    returns a zillow data frame ready to split
-    
-    df = acquire_zillow()
-    clean_from_ids(df)
-    fill_nulls(df)
-    drop_nulls(df)
-    df = handle_outliers(df)
-    df = transform_columns(df)
-    df = engineering(df)
-
-    filename = 'clean_zillow.csv'
-    df.to_csv(filename, index_label = False)
-
-    return df
-'''
 
 ########### bins for exploration ######
 
@@ -465,14 +447,11 @@ def split_zillow(df):
                                        random_state=seed)
     return train, validate, test
 
-def full_split_zillow(train, validate, test, target):
+def full_split_zillow(df):
     '''
-    accepts train, validate, test data sets and the name of the target variable as a parameter
-    splits the data frame into:
-    X_train, X_validate, X_test, y_train, y_validate, y_test
+    the function accepts a zillow data frame a 
     '''
-    #train, validate, test = train_validate_test_split(df, target)
-
+    train, validate, test = split_zillow(df)
     #save target column
     y_train = train[target]
     y_validate = validate[target]
