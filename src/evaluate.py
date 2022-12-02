@@ -20,6 +20,35 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.linear_model import LinearRegression
 from scipy.stats import spearmanr, pearsonr
 import pingouin as pg
+import plotly.express as px
+import matplotlib.pyplot as plt
+
+import src.wrangle as wr
+
+
+#############################################################
+######   Vizualizations for Notebook Presentation    ########
+#############################################################
+
+#############     Correlation barchart       ##############
+
+def correlation_viz():
+    plt.figure(figsize=(20,20))
+    df, _, __ = wr.split_zillow(wr.get_zillow())
+    num_variables = df.columns.tolist()
+    num_variables = num_variables[0:19]
+    num_variables
+    del num_variables[9:13]
+    
+    df['absolute_logerror'] = df['logerror'].abs()
+    pearson_df = pearson_test_df(df, 'absolute_logerror', num_variables)
+    pearson_df = pearson_df.sort_values(by = 'Minus_P', ascending=False)
+    fig = px.bar(pearson_df, y='Minus_P', x='Potential_Target',
+                 hover_data=['Keep'], color='Keep',
+                 labels={'Potential_Target':'Feature Variables To Build Model On', 'Minus_P': '1 - P value'},height=400)
+    fig.show()
+
+
 
 #############################################################
 ######   Tests for Continuous Variable Correlation   ########
@@ -70,8 +99,6 @@ def pearson_test_df(df, target_var, test_var_list):
         ignore_index = True)
         
     return pearson_df
-
-
 
 
 ##############################################################
