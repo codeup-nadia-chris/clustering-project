@@ -8,7 +8,7 @@ warnings.filterwarnings("ignore")
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import QuantileTransformer
+
 
 from sklearn.feature_selection import SelectKBest, RFE, f_regression
 from sklearn.linear_model import LinearRegression
@@ -465,24 +465,26 @@ def full_split_zillow(df):
     return train, validate, test, y_train, y_validate, y_test
 
 ##### scaling #####
-def standard_scale_zillow(X_train, X_validate, X_test):
+def standard_scale_zillow(train, validate, test, clustering = False):
     '''
     accepts train, validate, test data sets
     scales the data in each of them
     returns transformed data sets
     '''
-
-    #col = ['bedrooms', 'bathrooms', 'sq_feet', 'lot_sqft', 'house_age']
+    if clustering:
+        col = train.iloc[:, :11].columns.tolist()
+    #else:
+        #col = 
     
     # create scalers
     scaler = StandardScaler()    
     #qt = QuantileTransformer(output_distribution='normal')
-    scaler.fit(X_train)
-    X_train_scaled = scaler.transform(X_train)
-    X_validate_scaled = scaler.transform(X_validate)
-    X_test_scaled = scaler.transform(X_test)
+    scaler.fit(train[col])
+    train[col] = scaler.transform(train[col])
+    validate[col] = scaler.transform(validate[col])
+    test[col] = scaler.transform(test[col])
     
-    return X_train_scaled, X_validate_scaled, X_test_scaled
+    return train, validate, test
 
 def scale_dataframe(train):
     '''
