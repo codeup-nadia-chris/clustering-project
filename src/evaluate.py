@@ -25,7 +25,7 @@ import pingouin as pg
 ######   Tests for Continuous Variable Correlation   ########
 #############################################################
 
-##############              Spearman             ##############
+##############             Spearman            ##############
 def spearman_test(df, target_var, test_var):
     '''alternative test for continuous to continuous correlation tests.
     Is used when correlation has a curilinear shape, rather than linear.
@@ -33,13 +33,45 @@ def spearman_test(df, target_var, test_var):
     r, p_value = spearmanr(df[target_var], df[test_var])
     print(f'Spearman Correlation Coefficient of {test_var}: {r}\nP-value: {p_value:.3f}')
 
-##############              Pearson              ##############
+
+##############       Two Versions of Pearson           ##############
 
 def pearson_test(df, target_var, test_var):
     '''default test for continuous to continuous correlation tests. 
     Handles linear relationships well'''
     r, p_value = pearsonr(df[target_var], df[test_var])
     print(f'Pearson Correlation Coefficient of {test_var}: {r}\nP-value: {p_value:.3f}')
+
+
+def pearson_test_df(df, target_var, test_var_list):
+    '''default test for continuous to continuous correlation tests. 
+    Handles linear relationships well'''
+    
+    pearson_df = pd.DataFrame(
+        {'Potential_Target':[],
+         'Coefficient' :[],
+         'P-Value' : [],
+         'Minus_P' : [],
+         'Keep' : [],})
+
+    for item in test_var_list:
+        r, p_value = pearsonr(df[target_var], df[item])
+        if 1 - p_value >= 0.95:
+            keeper = 'Yes'
+        else:
+            keeper = 'No'
+        
+        pearson_df = pearson_df.append(
+        {'Potential_Target': item,
+         'Coefficient' : r,
+         'P-Value' : p_value,
+         'Minus_P' : 1-p_value,
+         'Keep' : keeper},
+        ignore_index = True)
+        
+    return pearson_df
+
+
 
 
 ##############################################################
