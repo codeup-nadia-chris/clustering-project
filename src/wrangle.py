@@ -413,8 +413,8 @@ def engineering(df):
    
     new_order_cols = ['sqft',  'garage_sqft', 'lot_sqft', 'age', 
         'structure_price', 'price','land_price', 'tax_amount', 
-        'bed_bath_ratio', 'city_id', 'zip', 'latitude', 'longitude',
-        'bath', 'beds', 'fireplace', 'garage', 'hottub_spa', 'pool', 
+        'bath', 'beds', 'bed_bath_ratio', 'city_id', 'zip', 'latitude', 'longitude',
+        'fireplace', 'garage', 'hottub_spa', 'pool', 
         'county_land_code', 'county_number', 'county_name', 'logerror']
     return df[new_order_cols]
 
