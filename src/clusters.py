@@ -39,6 +39,13 @@ def visualize_map(df):
     plt.yticks([])
     plt.xticks([])
 
+def viz_zip_counties(df):
+    plt.figure(figsize=(12,6))
+    sns.scatterplot(data=df, y='zip', x='logerror', hue='county_name')
+    plt.title('Zip codes and counties')
+    plt.xticks([])
+    plt.yticks([])
+    plt.show()
 
 ######## find the best k for k-meean ######
 
