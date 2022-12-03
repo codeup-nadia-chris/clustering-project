@@ -23,19 +23,41 @@ seed = 42 # random seed for random_states
 features = ['garage_sqft', 'age','beds','garage','fireplace','bath',\
             'bed_bath_ratio','lot_sqft','tax_amount','hottub_spa', 'Orange',\
             'Ventura', 'LA','logerror']
+features_counties = ['garage_sqft', 'age','beds','garage','fireplace','bath',\
+            'bed_bath_ratio','lot_sqft','tax_amount','hottub_spa', 'logerror']
 
 # get zillow data
 df = wr.get_zillow()
 
+# separate data based on location
+la_city = df[df.county_name == 'LA_city'] # LA city
+la = df[df.county_name == 'LA'] # LA county
+ventura = df[df.county_name == 'Ventura'] # Ventura county
+orange = df[df.county_name == 'Orange'] # Orange county
 
-# remove unneeded columns and add dummy variables for county_name
+# remove unneeded columns in counties data sets
+
+la_city = la_city[features_counties]
+la = la[features_counties]
+ventura = ventura[features_counties]
+orange = orange[features_counties]
+
+# remove unneeded columns and add dummy variables for county_name in the main data set
 df = wr.dummies(df)
 df = df[features]
 
+#split_counties into train, validate, test data sets and target vars
+XLA1, XLA2, XLA3, yla1, yla2, yla3 = wr.full_split_zillow(la)
+XLC1, XLC2, XLC3, ylc1, ylc2, ylc3 = wr.full_split_zillow(la_city)
+XO1, XO2, XO3, yo1, yo2, yo3 = wr.full_split_zillow(ventura)
+XV1, XV2, XV3, yv1, yv2, yv3 = wr.full_split_zillow(orange)
+# scale counties data sets
+XLA1, XLA2, XLA3 = wr.standard_scale_zillow(XLA1, XLA2, XLA3, counties=True)
+XLC1, XLC2, XLC3 = wr.standard_scale_zillow(XLC1, XLC2, XLC3, counties=True)
+XO1, XO2, XO3 = wr.standard_scale_zillow(XO1, XO2, XO3, counties=True)
+XV1, XV2, XV3 = wr.standard_scale_zillow(XV1, XV2, XV3, counties=True)
 
-# leave the 
-
-# split the data into 3 data sets and 3 target arrays
+# split the main data into 3 data sets and 3 target arrays
 X_train, X_validate, X_test, y_train, y_validate, y_test = wr.full_split_zillow(df)
 
 # get scaled X_train, X_validate, X_test sets
@@ -74,12 +96,12 @@ def regression_errors(y_actual, y_predicted):
 
 ############### MODELING FUNCTIONS ###############
 
-def run_models(X_train, X_validate, y_train, y_validate, f_number):
+def run_models(X_train, X_validate, y_train, y_validate, f_name='stand '):
     
     '''
     general function to run models with X_train and X_validate that were scaled
     '''
-    feature_name = 'stand ' + str(f_number)
+    feature_name = f_name # + str(f_number)
     for key in models:
         # create a model
         model = models[key]
@@ -100,29 +122,32 @@ def run_models(X_train, X_validate, y_train, y_validate, f_number):
         # add the score results to the scores Data Frame
         scores.loc[len(scores.index)] = [key, feature_name, R2, R2_val]
 
-def run_polinomial(X1, X2, y_train, y_validate, f_number):
-    i = 5 # first 6 features
-    poly = PolynomialFeatures(degree=2, include_bias=False, interaction_only=False)
-    poly.fit(X1.iloc[:, :i])
+def run_polinomial(X1, X2, y_train, y_validate, f_name='poly '):
+    '''
+    
+    '''
+    f = ['beds', 'bath']
+    poly = PolynomialFeatures(degree=3, include_bias=False, interaction_only=False)
+    poly.fit(X1[f])
     # create a df with transformed features of the train set
     X1_poly = pd.DataFrame(
-        poly.transform(X1.iloc[:, :i]),
-        columns=poly.get_feature_names(X1.iloc[:, :i].columns),
+        poly.transform(X1[f]),
+        columns=poly.get_feature_names(f),
         index=X1.index)
-    X1_poly = pd.concat([X1_poly, X1.iloc[:, i:]], axis=1)
+    X1_poly = pd.concat([X1_poly, X1[f]], axis=1)
     #X1_poly = pd.concat([X1_poly, X1], axis=1)
 
     #display(X1_poly.head(1)) #testing the columns
 
     # create a df with transformed features for the validate set
     X2_poly = pd.DataFrame(
-        poly.transform(X2.iloc[:, :i]),
-        columns=poly.get_feature_names(X2.iloc[:, :i].columns),
+        poly.transform(X2[f]),
+        columns=poly.get_feature_names(X2[f].columns),
         index=X2.index)
-    X2_poly = pd.concat([X2_poly, X2.iloc[:, i:]], axis=1)
+    X2_poly = pd.concat([X2_poly, X2[f]], axis=1)
     #X2_poly = pd.concat([X2_poly, X2], axis=1)
 
-    feature_name = 'poly '+ str(f_number)
+    feature_name = f_name #+ str(f_number)
 
     for key in models:
         # create a model
@@ -149,7 +174,7 @@ def get_scores():
     scores.drop(scores.index, axis=0, inplace=True)
     run_models(X_train, X_validate, y_train, y_validate, np.nan)
     run_polinomial(X_train.iloc[:, :-1], X_validate.iloc[:, :-1], y_train, y_validate,np.nan)
-    return scores
+    return scores.sort_values(by=['R2_train', 'R2_validate'], ascending=False).head(10)
 
 
 ############# RUN MODELS ON CLUSTERS ##############
@@ -180,7 +205,7 @@ def check_numerical_clusters():
         run_models(X1, X2, y1, y2, j)
         run_polinomial(X1.iloc[:, :-1], X2.iloc[:, :-1], y1, y2, j)
         
-    return scores
+    return scores.sort_values(by=['R2_train', 'R2_validate'], ascending=False).head(10)
 
 def check_location_clusters():
     '''
@@ -205,7 +230,7 @@ def check_location_clusters():
         run_models(X1, X2, y1, y2, j)
         run_polinomial(X1.iloc[:, :-1], X2.iloc[:, :-1], y1, y2, j)
         
-    return scores
+    return scores.sort_values(by=['R2_train', 'R2_validate'], ascending=False).head(10)
 
 def get_cluster_scores():
     '''
@@ -222,3 +247,25 @@ def get_cluster_scores():
     cluster_results = cluster_results[columns2]
     
     return cluster_results
+
+######### RUN MODELS ON COUNTY DATA SETS
+def get_counties_scores(): 
+    # empty the scores data frame
+    scores.drop(scores.index, axis=0, inplace=True)
+    # la county
+    run_models(XLA1, XLA2, yla1, yla2, f_name='la stand')
+    run_polinomial(XLA1, XLA2, yla1, yla2, f_name='la poly')
+
+    # la city
+    run_models(XLC1, XLC2, ylc1, ylc2, f_name='l_city stand')
+    run_polinomial(XLC1, XLC2, ylc1, ylc2, f_name='l_city poly')
+
+    # orange county
+    run_models(XO1, XO2, yo1, yo2, f_name='orange stand')
+    run_polinomial(XO1, XO2, yo1, yo2, f_name='orange poly')
+
+    # ventura county
+    run_models(XV1, XV2, yv1, yv2, f_name='ventura stand')
+    run_polinomial(XV1, XV2, yv1, yv2, f_name='ventura poly')
+    
+    return scores.sort_values(by=['R2_train', 'R2_validate'], ascending=False).head(10)
