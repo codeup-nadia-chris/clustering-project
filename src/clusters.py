@@ -162,14 +162,22 @@ def viz_clustering_results():
 def add_location_clusters(train, validate, test): 
     '''
     the function accepts train, validate, test as parameters
-    returns those sets with columns with clusters attached
+    returns those sets with columns with location clusters attached
     '''
     train['location_clusters'] = loc_train.astype('uint8')
     validate['location_clusters'] = loc_validate.astype('uint8')
     test['location_clusters'] = loc_test.astype('uint8')
+    
+    return train, validate, test
+
+def add_numerical_clusters(train, validate, test):
+    '''
+    the function accepts train, validate, test as parameters
+    returns those sets with columns with numerical clusters attached
+    '''
     train['numerical_clusters'] = num_train.astype('uint8')
     validate['numerical_clusters'] = num_validate.astype('uint8')
     test['numerical_clusters'] = num_test.astype('uint8')
-    
+
     return train, validate, test
 
