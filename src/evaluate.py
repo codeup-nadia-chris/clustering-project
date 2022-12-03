@@ -49,6 +49,18 @@ def correlation_viz():
     fig.show()
 
 
+#############     Example Plot       ##############
+
+def correlation_plot(df):
+    plt.figure(figsize=(20,20))
+    
+    plt.show()
+    sns.set_palette('BrBG_r')
+    sns.lmplot(data=df, y='absolute_logerror', x = 'sqft', scatter_kws ={'alpha' : 0.2})
+    
+    sns.set_palette('BrBG_r')
+    sns.lmplot(data=df, y='absolute_logerror', x = 'garage_sqft', scatter_kws ={'alpha' : 0.2})
+    plt.show()
 
 #############################################################
 ######   Tests for Continuous Variable Correlation   ########
