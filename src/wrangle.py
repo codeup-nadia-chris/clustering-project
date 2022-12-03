@@ -473,8 +473,10 @@ def standard_scale_zillow(train, validate, test, clustering = False):
     '''
     if clustering:
         col = train.iloc[:, :11].columns.tolist()
-    #else:
-        #col = 
+    else:
+        col = ['garage_sqft','age','beds',
+                                'garage','fireplace','bath',\
+                                'bed_bath_ratio', 'lot_sqft','tax_amount']
     
     # create scalers
     scaler = StandardScaler()    
@@ -486,15 +488,29 @@ def standard_scale_zillow(train, validate, test, clustering = False):
     
     return train, validate, test
 
-def scale_dataframe(train):
+def standard_scale_one_df(train):
     '''
-    scale a data frame for clustering
+    scales one data frame to make clustering observations
     '''
+    col = train.iloc[:, :11].columns.tolist()
+    
     # create scalers
     scaler = StandardScaler()    
     #qt = QuantileTransformer(output_distribution='normal')
-    return scaler.fit_transform(train)
+    scaler.fit(train[col])
+    train[col] = scaler.transform(train[col])
+    return train
 
+########## create dummies before modeling #######
+def dummies(df):
+    '''
+    create dummy variables for LA and Ventura
+    '''
+    # create dummies for LA and Ventura
+    df['Orange'] = np.where(df.county_name == 'Orange', 1, 0)
+    df['Ventura'] = np.where(df.county_name == 'Ventura', 1, 0)
+    df['LA'] = np.where(df.county_name == 'LA', 1, 0)
+    return df.drop(columns='county_name')
 
 ############ printing functions ###########
 
