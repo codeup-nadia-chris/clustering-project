@@ -18,7 +18,7 @@ import numpy as np
 from math import sqrt
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.linear_model import LinearRegression
-from scipy.stats import spearmanr, pearsonr
+from scipy.stats import spearmanr, pearsonr, f_oneway
 import pingouin as pg
 import plotly.express as px
 import matplotlib.pyplot as plt
@@ -60,6 +60,14 @@ def correlation_plot(df):
     
     sns.set_palette('BrBG_r')
     sns.lmplot(data=df, y='absolute_logerror', x = 'garage_sqft', scatter_kws ={'alpha' : 0.2})
+    plt.show()
+
+#############     Example Plot       ##############
+
+def viz_log_distribution(df):
+    plt.figure(figsize=(12, 6))
+    sns.histplot(data = df, x='logerror', hue='county_name', kde = True,bins = 10, palette='flare')
+    plt.title('Logerror distribution in counties')
     plt.show()
 
 #############################################################
@@ -123,6 +131,14 @@ def t_test(df, target_var, test_var):
     relationship between a categorical and continuous variable'''
     results = pg.ttest(df[target_var], df[test_var], correction=True)
     print(f'P-Val {test_var} = {results.iloc[0,3]:.3f}')
+
+#############             ANOVA test           ##############
+def test_logerror_counties(df):
+    f, p = f_oneway(df[df['county_name'] == 'LA'].logerror, 
+                   df[df['county_name'] == 'Orange'].logerror, 
+                   df[df['county_name'] == 'Ventura'].logerror,
+                    df[df['county_name'] == 'LA_city'].logerror)
+    print(f'F-statistics: {round(f, 3)}, p: {round(p, 3)}')
 
 
 
