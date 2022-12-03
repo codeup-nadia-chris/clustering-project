@@ -51,7 +51,10 @@ def correlation_viz():
 
 #############     Example Plot       ##############
 
-def correlation_plot(df):
+def correlation_plot1(df):
+    '''
+    replaces by correlation plot
+    '''
     plt.figure(figsize=(20,20))
     
     plt.show()
@@ -60,6 +63,24 @@ def correlation_plot(df):
     
     sns.set_palette('BrBG_r')
     sns.lmplot(data=df, y='absolute_logerror', x = 'garage_sqft', scatter_kws ={'alpha' : 0.2})
+    plt.show()
+
+# call regplot on each axes
+def correlation_plot(df):
+    '''
+    the function plots scatter plots with the regression line for the worst and the best correlated
+    features in the data set
+    '''
+    # select the color panel
+    sns.set_palette('BrBG_r')
+    # initialize layout
+    _, (ax1, ax2) = plt.subplots(ncols=2, sharey=True, figsize=(20, 8))
+    # plot the 1st scatter plot
+    sns.regplot(data=df, y='absolute_logerror', x = 'sqft', scatter_kws ={'alpha' : 0.02}, ax=ax1)
+    ax1.set_title('Worst feature: sqft')
+    # plot the 2nd scatter plot
+    sns.regplot(data=df, y='absolute_logerror', x = 'garage_sqft', scatter_kws ={'alpha' : 0.022}, ax=ax2)
+    ax2.set_title('Best feature: garage_sqft')
     plt.show()
 
 #############     Example Plot       ##############
