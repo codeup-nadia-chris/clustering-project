@@ -465,7 +465,7 @@ def full_split_zillow(df):
     return train, validate, test, y_train, y_validate, y_test
 
 ##### scaling #####
-def standard_scale_zillow(train, validate, test, clustering = False):
+def standard_scale_zillow(train, validate, test, clustering = False, counties=False):
     '''
     accepts train, validate, test data sets
     scales the data in each of them
@@ -473,6 +473,8 @@ def standard_scale_zillow(train, validate, test, clustering = False):
     '''
     if clustering:
         col = train.iloc[:, :11].columns.tolist()
+    if counties:
+        col = train.iloc[:, :-1].columns.tolist()
     else:
         col = ['garage_sqft','age','beds',
                                 'garage','fireplace','bath',\
