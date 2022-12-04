@@ -23,17 +23,11 @@ seed = 42 # random seed for random_states
 features = ['garage_sqft', 'age','beds','garage','fireplace','bath',\
             'bed_bath_ratio','lot_sqft','tax_amount','hottub_spa', 'Orange',\
             'Ventura', 'LA','logerror']
-'''
-features_counties = ['garage_sqft', 'age','beds','garage','fireplace','bath',\
-            'bed_bath_ratio','lot_sqft','tax_amount','hottub_spa', 'logerror']
-'''
 features_counties = ['garage_sqft', 'age','beds','garage','fireplace','bath',\
             'bed_bath_ratio','lot_sqft','tax_amount','hottub_spa', 'logerror']
 
 # get zillow data
 df = wr.get_zillow()
-
-# 
 
 # separate data based on location
 la_city = df[df.county_name == 'LA_city'] # LA city
@@ -178,9 +172,9 @@ def run_polinomial(X1, X2, y_train, y_validate, f_name='poly '):
 def get_scores():
     # empty the scores data frame
     scores.drop(scores.index, axis=0, inplace=True)
-    run_models(X_train, X_validate, y_train, y_validate, np.nan)
-    run_polinomial(X_train.iloc[:, :-1], X_validate.iloc[:, :-1], y_train, y_validate,np.nan)
-    return scores.sort_values(by=['R2_train', 'R2_validate'], ascending=False).head(10)
+    run_models(X_train, X_validate, y_train, y_validate, f_name='stand ')
+    run_polinomial(X_train.iloc[:, :-1], X_validate.iloc[:, :-1], y_train, y_validate)
+    return scores.sort_values(by=['R2_train'], ascending=False).head(10)
 
 
 ############# RUN MODELS ON CLUSTERS ##############
@@ -211,7 +205,7 @@ def check_numerical_clusters():
         run_models(X1, X2, y1, y2, j)
         run_polinomial(X1.iloc[:, :-1], X2.iloc[:, :-1], y1, y2, j)
         
-    return scores.sort_values(by=['R2_train', 'R2_validate'], ascending=False).head(10)
+    return scores.head(5)
 
 def check_location_clusters():
     '''
@@ -236,7 +230,7 @@ def check_location_clusters():
         run_models(X1, X2, y1, y2, j)
         run_polinomial(X1.iloc[:, :-1], X2.iloc[:, :-1], y1, y2, j)
         
-    return scores.sort_values(by=['R2_train', 'R2_validate'], ascending=False).head(10)
+    return scores.head(5)
 
 def get_cluster_scores():
     '''
@@ -252,8 +246,7 @@ def get_cluster_scores():
     columns2 = ['Location_R2_train', 'R2_val_loc', 'Numerical_R2_train', 'R2_val_num']
     cluster_results = cluster_results[columns2]
     
-    #return cluster_results
-    return cluster_results.sort_values(by=['R2_val_num','Numerical_R2_train'], ascending=False).head(10)
+    return cluster_results
 
 ######### RUN MODELS ON COUNTY DATA SETS
 def get_counties_scores(): 
@@ -264,8 +257,8 @@ def get_counties_scores():
     run_polinomial(XLA1, XLA2, yla1, yla2, f_name='la poly')
 
     # la city
-    run_models(XLC1, XLC2, ylc1, ylc2, f_name='LA_city stand')
-    run_polinomial(XLC1, XLC2, ylc1, ylc2, f_name='LA_city poly')
+    run_models(XLC1, XLC2, ylc1, ylc2, f_name='la_city stand')
+    run_polinomial(XLC1, XLC2, ylc1, ylc2, f_name='la_city poly')
 
     # orange county
     run_models(XO1, XO2, yo1, yo2, f_name='orange stand')
@@ -275,5 +268,20 @@ def get_counties_scores():
     run_models(XV1, XV2, yv1, yv2, f_name='ventura stand')
     run_polinomial(XV1, XV2, yv1, yv2, f_name='ventura poly')
     
-    #return scores.sort_values(by=['R2_train', 'R2_validate'], ascending=False).head(10)
-    return scores.sort_values(by=['R2_validate','R2_train'], ascending=False).head(10)
+    return scores.sort_values(by=['R2_train', 'R2_validate'], ascending=False).head(10)
+
+####### get the scores of the best model ###########
+def get_final_scores():
+    XLC1, XLC2, XLC3, ylc1, ylc2, ylc3 = wr.full_split_zillow(la_city)
+    LC1, XLC2, XLC3 = wr.standard_scale_zillow(XLC1, XLC2, XLC3, counties=True)
+    rf = RandomForestRegressor(max_depth=4, random_state=seed)
+    rf.fit(XLC1, ylc1)
+    y_hat_train = rf.predict(XLC1)
+    y_hat_validate = rf.predict(XLC2)
+    y_hat_test = rf.predict(XLC3)
+    R2_train = regression_errors(ylc1, y_hat_train)
+    R2_validate = regression_errors(ylc2, y_hat_validate)
+    R2_test = regression_errors(ylc3, y_hat_test)
+    final_scores = pd.DataFrame(columns=['model_name','train', 'validate', 'test'])
+    final_scores.loc[len(final_scores.index)] = ['Random Forest Regressor', R2_train, R2_validate, R2_test]
+    return final_scores
