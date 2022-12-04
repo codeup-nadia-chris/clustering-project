@@ -4,15 +4,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib import cm
+import scipy.stats as stats
 
-from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 
 import src.wrangle as wr
 
+####### display options
+pd.options.display.float_format = '{:,.3f}'.format
+# define the default font sizes
+plt.rc('font', size=14)
+plt.rc('axes', labelsize=14, titlesize=14)
+plt.rc('legend', fontsize=14)
+plt.rc('xtick', labelsize=10)
+plt.rc('ytick', labelsize=10)
+
 ########## GLOBAL VARIABLES #######
 
 seed = 42
+alpha = 0.05
+
+
 
 # features to use for clustering
 location = ['latitude', 'longitude'] # 6 clusters
@@ -117,10 +129,10 @@ def run_clustering_numerical():
     the function create clusters based on numerical columns
     return 3 arrays with cluster numbers that can be added to the train/validate/test data frames
     '''
-    kmeans = KMeans(n_clusters=7, init='k-means++', random_state=seed)
-    num_train = kmeans.fit_predict(X_train[numerical])
-    num_validate = kmeans.predict(X_validate[numerical])
-    num_test = kmeans.predict(X_test[numerical])
+    kmeans1 = KMeans(n_clusters=7, init='k-means++', random_state=seed)
+    num_train = kmeans1.fit_predict(X_train[numerical])
+    num_validate = kmeans1.predict(X_validate[numerical])
+    num_test = kmeans1.predict(X_test[numerical])
     return num_train, num_validate, num_test
 
  #### get values of clustering
@@ -188,3 +200,76 @@ def add_numerical_clusters(train, validate, test):
 
     return train, validate, test
 
+############## EXPLORATION WITH CLUSTERS #######################
+def test_clusters():
+    '''
+    the function displays the results of t-test for every cluster' mean vs logerror' mean
+    '''
+    # print the results of location clusters
+    print('Location clusters')
+    for i in range(6):
+        twc = train_with_clusters[train_with_clusters.location_clusters == i]
+        t, p = stats.ttest_1samp(twc.logerror, train.logerror.mean())
+        if p < alpha:
+            print(f'Cluater {i}: the difference in means is significant. P-value={round(p, 3)}')
+        else:
+            print(f'Cluater {i}: the difference in means is not significant. P-value={round(p, 3)}')
+    print()
+
+    
+    # print the results of numerical clusters
+    print('Numerical clusters')
+    for i in range(7):
+        twc = train_with_clusters[train_with_clusters.numerical_clusters == i]
+        t, p = stats.ttest_1samp(twc.logerror, train.logerror.mean())
+        if p < alpha:
+            print(f'Cluster {i}: the difference in means is significant. P-value={round(p, 3)}')
+        else:
+            print(f'Cluster {i}: the difference in means is not significant. P-value={round(p, 3)}')
+    print()
+
+
+#def dummies_for_loc_clusters(loc_train, loc_validate, loc_test):
+    '''
+    creates dummies for the location clusters
+    replaces signficant clusters with 1 and not significat with 0
+    returns dummies for train, validate, test data sets
+    '''
+    # creaate dummies for location clusters
+    
+    #loc_train = loc_train.replace({0:1, 1:0, 2:0, 3:1, 4:1, 5:1})
+    #loc_validate = loc_validate.replace({0:1, 1:0, 2:0, 3:1, 4:1, 5:1})
+    #loc_test = loc_test.replace({0:1, 1:0, 2:0, 3:1, 4:1, 5:1})
+    
+    #return loc_train, loc_validate, loc_test
+
+#def dummies_for_num_clusters(num_train, num_validate, num_test):
+    '''
+    creates dummies for the numerical clusters
+    replaces signficant clusters with 1 and not significat with 0
+    returns dummies for train, validate, test data sets
+    '''
+    # create dummies for numerical clusters
+    
+    #num_train = num_train.replace({2:0, 3:0, 4:1, 5:1, 6:0})
+    #num_validate = num_validate.replace({2:0, 3:0, 4:1, 5:1, 6:0})
+    #num_test = num_test.replace({2:0, 3:0, 4:1, 5:1, 6:0})
+    
+    #return num_train, num_validate, num_test
+
+def viz_cluster_means():
+    '''
+    the function creates barplots with means of 
+    location and numerical clusters
+    '''
+    plt.figure(figsize=(20, 6))
+    plt.suptitle('Logerror means of the clusters')
+
+    plt.subplot(121)
+    sns.barplot(data=train_with_clusters, x='location_clusters', y='logerror')
+    plt.title('Location clusters')
+
+    plt.subplot(122)
+    sns.barplot(data=train_with_clusters, x='numerical_clusters', y='logerror')
+    plt.title('Numerical clusters')
+    plt.show()
