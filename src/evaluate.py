@@ -1,16 +1,4 @@
-'''
-Create a file named evaluate.py that contains the following functions.
 
-- plot_residuals(y, yhat): creates a residual plot
-- regression_errors(y, yhat): returns the following values:
-    sum of squared errors (SSE)
-    explained sum of squares (ESS)
-    total sum of squares (TSS)
-    mean squared error (MSE)
-    root mean squared error (RMSE)
-- baseline_mean_errors(y): computes the SSE, MSE, and RMSE for the baseline model
-- better_than_baseline(y, yhat): returns true if your model performs better than the baseline, otherwise false
-'''
 
 import seaborn as sns
 import pandas as pd
@@ -59,6 +47,7 @@ def correlation_plot1(df):
     
     plt.show()
     sns.set_palette('BrBG_r')
+
     sns.lmplot(data=df, y='absolute_logerror', x = 'sqft', scatter_kws ={'alpha' : 0.2})
     
     sns.set_palette('BrBG_r')
@@ -74,13 +63,18 @@ def correlation_plot(df):
     # select the color panel
     sns.set_palette('BrBG_r')
     # initialize layout
-    _, (ax1, ax2) = plt.subplots(ncols=2, sharey=True, figsize=(20, 8))
+    _, (ax1, ax2) = plt.subplots(ncols=2, sharey=True, figsize=(15, 8))
     # plot the 1st scatter plot
-    sns.regplot(data=df, y='absolute_logerror', x = 'sqft', scatter_kws ={'alpha' : 0.02}, ax=ax1)
+    a = sns.regplot(data=df, y='absolute_logerror', x = 'sqft', scatter_kws ={'alpha' : 0.02}, ax=ax1)
+    #sns.regplot(data=df, y='absolute_logerror', x = 'sqft', scatter_kws ={'alpha' : 0.02}, ax=ax1)
     ax1.set_title('Worst feature: sqft')
+    a.set_xlim(0,4000)
+    a.set_ylim(0,0.25)
     # plot the 2nd scatter plot
-    sns.regplot(data=df, y='absolute_logerror', x = 'garage_sqft', scatter_kws ={'alpha' : 0.022}, ax=ax2)
+    b = sns.regplot(data=df, y='absolute_logerror', x = 'garage_sqft', scatter_kws ={'alpha' : 0.02}, ax=ax2)
     ax2.set_title('Best feature: garage_sqft')
+    b.set_xlim(-50,1500)
+    b.set_ylim(0,0.25)
     plt.show()
 
 #############     Example Plot       ##############
