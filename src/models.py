@@ -23,11 +23,17 @@ seed = 42 # random seed for random_states
 features = ['garage_sqft', 'age','beds','garage','fireplace','bath',\
             'bed_bath_ratio','lot_sqft','tax_amount','hottub_spa', 'Orange',\
             'Ventura', 'LA','logerror']
+'''
+features_counties = ['garage_sqft', 'age','beds','garage','fireplace','bath',\
+            'bed_bath_ratio','lot_sqft','tax_amount','hottub_spa', 'logerror']
+'''
 features_counties = ['garage_sqft', 'age','beds','garage','fireplace','bath',\
             'bed_bath_ratio','lot_sqft','tax_amount','hottub_spa', 'logerror']
 
 # get zillow data
 df = wr.get_zillow()
+
+# 
 
 # separate data based on location
 la_city = df[df.county_name == 'LA_city'] # LA city
@@ -246,7 +252,8 @@ def get_cluster_scores():
     columns2 = ['Location_R2_train', 'R2_val_loc', 'Numerical_R2_train', 'R2_val_num']
     cluster_results = cluster_results[columns2]
     
-    return cluster_results
+    #return cluster_results
+    return cluster_results.sort_values(by=['R2_val_num','Numerical_R2_train'], ascending=False).head(10)
 
 ######### RUN MODELS ON COUNTY DATA SETS
 def get_counties_scores(): 
@@ -257,8 +264,8 @@ def get_counties_scores():
     run_polinomial(XLA1, XLA2, yla1, yla2, f_name='la poly')
 
     # la city
-    run_models(XLC1, XLC2, ylc1, ylc2, f_name='l_city stand')
-    run_polinomial(XLC1, XLC2, ylc1, ylc2, f_name='l_city poly')
+    run_models(XLC1, XLC2, ylc1, ylc2, f_name='LA_city stand')
+    run_polinomial(XLC1, XLC2, ylc1, ylc2, f_name='LA_city poly')
 
     # orange county
     run_models(XO1, XO2, yo1, yo2, f_name='orange stand')
@@ -268,4 +275,5 @@ def get_counties_scores():
     run_models(XV1, XV2, yv1, yv2, f_name='ventura stand')
     run_polinomial(XV1, XV2, yv1, yv2, f_name='ventura poly')
     
-    return scores.sort_values(by=['R2_train', 'R2_validate'], ascending=False).head(10)
+    #return scores.sort_values(by=['R2_train', 'R2_validate'], ascending=False).head(10)
+    return scores.sort_values(by=['R2_validate','R2_train'], ascending=False).head(10)

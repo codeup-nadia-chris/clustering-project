@@ -325,3 +325,61 @@ lm.fit(vent_x_train, vent_y_train)
 vent_simple_model = lm.predict(vent_x_train)
 
 '''
+
+
+##########################################################
+######   DF displaying features kept or dropped   ########
+##########################################################
+
+##############       dropped features       ##############
+
+def dropped_variables_df():
+    features = ['pool',
+                'sqft',
+                'structure_price',
+                'zip',
+                'city_id',
+                'latitude',
+                'longitude',
+                'county_land_code',
+                'county_number',
+                'price']
+
+    reasons = ['statistically_insignificant',
+               'statistically_insignificant',
+               'statistically_insignificant',
+               'computationally_infeasible',
+               'computationally_infeasible',
+               'added_to_cluster',
+               'added_to_cluster',
+               'theoretically_ruled_out',
+               'model_split_along_feature_options',
+               'correlated_with_other_feature']
+
+    dropped_variables = pd.DataFrame(
+        {'Feature_Name': features,
+         'Reason_to_Drop': reasons})
+    return dropped_variables
+
+
+##############       kept features       ##############
+
+def kept_features_df():
+    keeper_variables = ['garage_sqft',
+                         'age',
+                         'beds',
+                         'garage',
+                         'fireplace',
+                         'bath',
+                         'land_price',
+                         'bed_bath_ratio',
+                         'lot_sqft',
+                         'tax_amount',
+                         'hottub_spa',
+                         'logerror']
+
+
+
+    kept_variables = pd.DataFrame(
+        {'Feature_Name': keeper_variables})
+    return kept_variables
