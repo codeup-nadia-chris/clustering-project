@@ -13,14 +13,6 @@ import matplotlib.pyplot as plt
 
 import src.wrangle as wr
 
-# display options
-pd.options.display.float_format = '{:,.3f}'.format
-# define the default font sizes
-plt.rc('font', size=14)
-plt.rc('axes', labelsize=14, titlesize=14)
-plt.rc('legend', fontsize=14)
-plt.rc('xtick', labelsize=10)
-plt.rc('ytick', labelsize=10)
 
 
 
@@ -91,9 +83,44 @@ def correlation_plot(df):
 #############     Example Plot       ##############
 
 def viz_log_distribution(df):
+    '''
+    the function show the distribution of the target variable
+    '''
     plt.figure(figsize=(12, 6))
     sns.histplot(data = df, x='logerror', hue='county_name', kde = True,bins = 10, palette='flare')
     plt.title('Logerror distribution in counties')
+    plt.show()
+
+#######
+def viz_bath_vs_logerror(df):
+    '''
+    the function creates a boxplot 
+    that shows how the logerror differs with different types of bathrooms
+    
+    '''
+    plt.figure(figsize=(12,6))
+    sns.boxplot(data=df, x='bath', y='logerror')
+    plt.title('Number of bathrooms vs logerror')
+    plt.ylim(-0.4, 0.4)
+    plt.show()
+
+def viz_age_vs_logerror(df):
+    '''
+    the function creates a house age bins and plots a barplot that compares 
+    the logerror among those bins
+    '''
+    # create a copy of a data frame
+    df1 = df.copy()
+    # create age bins
+    df1['age_bins'] = pd.cut(df1.age, bins=[0, 20, 40, 60, 80, 100, 130])
+    #age_bins = []
+    # save unique age bins to the list
+    #for i in range(6):
+        #age_bins.append(str(df1.age_bins.value_counts().reset_index().sort_values(by='index').iloc[i, 0]))
+    df1.age_bins = df1.age_bins.astype(str)
+    plt.figure(figsize=(10, 6))
+    sns.barplot(data=df1, x='age_bins', y='logerror')
+    plt.title('Logerror by house age')
     plt.show()
 
 #############################################################
