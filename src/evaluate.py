@@ -7,11 +7,22 @@ from math import sqrt
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.linear_model import LinearRegression
 from scipy.stats import spearmanr, pearsonr, f_oneway
-import pingouin as pg
+#import pingouin as pg
 import plotly.express as px
 import matplotlib.pyplot as plt
 
 import src.wrangle as wr
+
+# display options
+pd.options.display.float_format = '{:,.3f}'.format
+# define the default font sizes
+plt.rc('font', size=14)
+plt.rc('axes', labelsize=14, titlesize=14)
+plt.rc('legend', fontsize=14)
+plt.rc('xtick', labelsize=10)
+plt.rc('ytick', labelsize=10)
+
+
 
 
 #############################################################
@@ -141,11 +152,11 @@ def pearson_test_df(df, target_var, test_var_list):
 ##############################################################
 
 ##############              T-Test              ##############
-def t_test(df, target_var, test_var):
+#def t_test(df, target_var, test_var):
     '''test for determining if there is a statistically significant 
     relationship between a categorical and continuous variable'''
-    results = pg.ttest(df[target_var], df[test_var], correction=True)
-    print(f'P-Val {test_var} = {results.iloc[0,3]:.3f}')
+    #results = pg.ttest(df[target_var], df[test_var], correction=True)
+    #print(f'P-Val {test_var} = {results.iloc[0,3]:.3f}')
 
 #############             ANOVA test           ##############
 def test_logerror_counties(df):
