@@ -98,11 +98,15 @@ To clean data:
 - After the cleaning the data set contains 49,380 rows and 23 columns.
 - Approx. 5.6% of the observations were removed from the original data set.
 
-#### Exploration Takeaways
+#### Exploration Questions and Takeaways
+1. It is our suspicion that the identifiable counties and LA city are different groups. Are they? 
 - There is a significant difference in means among different locations. Splitting data based on location might be a good idea.
-- ```zip``` codes can not provide us with the information that can potentially be usefull in the clustering or modeling
-- ```latitude``` and ```longitude``` are potentially good variables for clustering.
-- Continious features don't show much correlation with our target variable. 
+2. Does the number of bathrooms interact with the ```logerror```?
+- Numberumber of the ```bathrooms``` affects the mean and the spread of the ```logerror```
+3. How does the ```age``` of the house relate to the ```logerror```?
+- House age affects the estimate error.
+4. Are there variables that can be useful in the prediction of the ```logerror```?
+- Continious features don't show much correlation with our target variable.
 
 #### Clustering Takeaways
 Some of cluster groups showed significant difference between the group's ```logerror``` mean and the population ```logerror``` mean. That's why we are going to create different models based on the clusters.
