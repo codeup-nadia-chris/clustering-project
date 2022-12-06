@@ -4,7 +4,7 @@ Clustering Project by Chis Rosenberger and Nadia Paz
 ##### Predicting errors on Zestimates - December 2, 2022
 
 ## Project's Goal
-Create cluster groups for the zillo data. Create machine learning models that will predict zestimate's ```logerror```
+Create cluster groups for the zillow data. Create machine learning models that will predict zestimate's ```logerror```
 
 ## Project's Purpose
 Evaluate if clusters help with improving prediction results.
