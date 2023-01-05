@@ -1,5 +1,5 @@
 # clustering-project
-Clustering Project by Chis Rosenberger and Nadia Paz
+Clustering Project by [Chis Rosenberger](https://github.com/jcrosenberger) and [Nadia Paz](https://github.com/nadia-paz)
 #### Where did Zillow go wrong?
 ##### Predicting errors on Zestimates - December 2, 2022
 
